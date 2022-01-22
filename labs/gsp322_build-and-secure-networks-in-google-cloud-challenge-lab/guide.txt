@@ -3,10 +3,12 @@
 
 # Task 1: Remove the overly permissive rules
     - Go to VPC Network > Firewall > Delete open-access rule (Checks its box and Click Delete)
+    # gcloud compute firewall-rules delete open-access
 
 # Task 2: Start the bastion host instance
     - Go to Compute Engine > VM instance
         - You will see bastion isntance with stopped condition, start it (Checks its box and Click Start/Resume)
+    # Go to Compute Engine and start Bastion instance.
 
 # Task 3: Create a firewall rule that allows SSH (tcp/22) from the IAP service and add network tag on bastion
     - In VM instances, Click bastion instance
@@ -18,6 +20,8 @@
         - Target tags: bastion
         - Source IP ranges: 35.235.240.0/20
         - Protocols and ports: Check TCP and input 22 (to allow SSH)
+    # gcloud compute firewall-rules create ssh-ingress --allow=tcp:22 --source-ranges 35.235.240.0/20 --target-tags [NETWORK TAG-1] --network acme-vpc
+    # gcloud compute instances add-tags bastion --tags=[NETWORK TAG-1] --zone=us-central1-b
 
 # Task 4: Create a firewall rule that allows traffic on HTTP (tcp/80) to any address and add network tag on juice-shop
     - In VM instances, Click juice-shop instance
@@ -29,6 +33,8 @@
         - Target tags: juice-shop
         - Source IP ranges: 0.0.0.0/0
         - Protocols and ports: Check TCP and input 80 (to allow HTTP)
+     # gcloud compute firewall-rules create http-ingress --allow=tcp:80 --source-ranges 0.0.0.0/0 --target-tags [NETWORK TAG-2] --network acme-vpc
+     # gcloud compute instances add-tags juice-shop --tags=[NETWORK TAG-2] --zone=us-central1-b
 
 # Task 5: Create a firewall rule that allows traffic on SSH (tcp/22) from acme-mgmt-subnet network address and add network tag on juice-shop
     - In Firewall rule > Create third firewall rule with configuration:
@@ -38,6 +44,10 @@
         - Source IP ranges: <IP address range of your acme-mgmt-subnet>
             # Note: go to VPC network and have a look to IP address ranges of acme-mgmt-subnet
         - Protocols and ports: Select TCP and enter 22 (to allow SSH)
+        
+    # gcloud compute firewall-rules create internal-ssh-ingress --allow=tcp:22 --source-ranges 192.168.10.0/24 --target-tags [NETWORK TAG-3] --network acme-vpc
+    # gcloud compute instances add-tags juice-shop --tags=[NETWORK TAG-3] --zone=us-central1-b
+
 
 # Task 6: SSH to bastion host via IAP and juice-shop via bastion 
     - Go to Compute Engine > VM instances 
@@ -45,3 +55,6 @@
     - SSH on bastion instance
         - *in ssh window
             - run: ssh <juice-shop Internal IP>
+    
+    # ssh [Internal IP address of juice-shop]
+
